@@ -23,6 +23,7 @@ Built as a full frontend SPA (Single Page Application) using React 18, it is str
 
 
 📁 Project Structure
+
 watika-gardenia/
 │
 ├── public/
