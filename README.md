@@ -181,12 +181,7 @@ Each service would become its own independent deployable unit:
 >- Easy to scale
 >- Fault isolation
 >
->👉 That’s why modern apps (like boutique apps) >use microservices.
-
-
-# 📊 Summary Table
-ServiceTypeCurrent StorageProduction StorageHorizontal ScaleMenu Service🔄 StatelessStatic JS fileRead-only DB / CDN✅ FreeSearch & Filter🔄 Stateless—Elasticsearch✅ FreePayment Service🔄 Stateless—External gateway✅ FreeNotification Service🔄 Stateless—Message queue✅ FreeRecommendation Service🔄 StatelessStatic JS fileRead-only DB✅ FreePromotion / Ad Service🔄 StatelessHardcoded rulesRules DB✅ FreeCart Service💾 StatefullocalStorageRedis (TTL)⚠️ CarefulOrder Service💾 StatefullocalStoragePostgreSQL⚠️ CarefulTracking Service💾 StatefulReact stateRedis + WebSocket⚠️ CarefulUser / Auth Service💾 StatefulNot built yetPostgreSQL + Redis⚠️ Careful
-
+>👉 That’s why modern apps (like restaurant apps) >use microservices.
 
 ---
 
@@ -206,140 +201,179 @@ So it uses **minimal persistence** on purpose.
 
 ## Service-by-Service Data Breakdown
 
-### ✅ **cartservice** → ✔️ HAS persistence
+### 🔄 Stateless Services (6)
+These services process and return — they don't own any data.
 
-**Storage used:**
+1. 🍽️ Menu Service
+Stateless
+Why: Dish catalogue is read-only static data (menuData.js).
+     Every request reads the same data — no writes, no sessions.
+     Can run 100 replicas simultaneously with identical output.
 
-- **Redis**
-
-**What’s stored:**
-
-- User cart items
-- Quantity, product IDs
-
-**Why Redis?**
-
-- Fast
-- Simple
-- Easy to reset
-- No schema complexity
-
-📌 In Kubernetes:
-
-- Redis runs as a pod (or StatefulSet)
-- Cart data is lost if Redis is deleted (by default)
+Data source: Static JS file / read-only database
+Scales: Horizontally — add pods freely
+Reset safe: ✅ Yes — no data loss on restart
 
 ---
 
-### ❌ **orders / checkout** → NO real database
+### ❌ 2. 🔍 Search & Filter Service
+Stateless
+Why: Takes a query, runs filter logic, returns results.
+     No memory of previous searches.
+     Each search request is fully independent.
 
-There is **NO dedicated “orders database”**.
-
-**checkoutservice:**
-
-- Aggregates data from:
-    - cartservice
-    - paymentservice
-    - shippingservice
-    - emailservice
-- Simulates order placement
-- Does **not persist orders**
-
-👉 This is **by design**, to keep the demo lightweight.
+Data source: Reads from Menu Service
+Scales: Horizontally
+Reset safe: ✅ Yes
 
 ---
 
-### ❌ **productcatalogservice**
+### ❌ 💳 Payment Service
+Stateless
+Why: Receives payment details, validates, calls payment gateway
+     (Razorpay/Stripe), returns success/failure.
+     The payment RECORD is stored by Order Service — not here.
 
-**Storage:**
-
-- Static JSON file
-- Loaded into memory at startup
-
-**No DB**
-
-- Products reset on restart
-
----
-
-### ❌ **recommendationservice**
-
-**Storage:**
-
-- Stateless
-- Generates recommendations dynamically
+Data source: External payment gateway (Razorpay, Stripe)
+Scales: Horizontally
+Reset safe: ✅ Yes — transaction records live in Order Service
 
 ---
 
-### ❌ **paymentservice**
+### ❌ 📧 Notification Service
+Stateless
+Why: Receives an event (order placed), sends email/SMS, done.
+     No memory of what was sent — logs go to logging stack.
 
-**Storage:**
-
-- None
-- Fake payment processor
-
----
-
-### ❌ **shippingservice**
-
-**Storage:**
-
-- None
-- Simulated shipping cost logic
+Data source: Triggered by Order Service events
+Scales: Horizontally
+Reset safe: ✅ Yes
 
 ---
 
-### ❌ **emailservice**
+### ❌ 🌟 Recommendation Service
+Stateless (in current build)
+Why: Takes current item/cart context, runs rating-based algorithm,
+     returns top N dishes. Pure function — same input = same output.
 
-**Storage:**
+Data source: Reads from Menu Service
+Scales: Horizontally
+Reset safe: ✅ Yes
 
-- None
-- Just logs “email sent”
-
----
-
-### ❌ **adservice**
-
-**Storage:**
-
-- In-memory ad data
-- No persistence
+Note: Becomes stateful if you add personalised ML models
+      trained on user behaviour history.
 
 ---
 
-### ❌ **frontend**
+### ❌ 📢 Promotion / Ad Service
+Stateless
+Why: Coupon codes are hardcoded rules (WELCOME20 = 20% off).
+     Validates a code and returns a discount value — no state held.
+     Ad banners rotate on a timer in the frontend.
 
-**Storage:**
+Data source: Static coupon ruleset
+Scales: Horizontally
+Reset safe: ✅ Yes
 
-- Stateless
-- Just UI + API calls
+Note: Becomes stateful if you track "coupon used per user"
+      to prevent reuse — needs a DB then.
 
 ---
 
-### ❌ **currencyservice**
+### 💾 Stateful / Persistent Services (4)
+These own data that must survive restarts, scaling events, and deployments.
 
-**Storage:**
+1. 🛒 Cart Service
+Stateful — Short-lived persistence
 
-- Static exchange rates
-- In-memory only
+Why: Cart must survive page refresh, tab close, browser restart.
+     In current build: localStorage (browser-side persistence).
+     In microservice build: Redis (TTL-based, per session/user).
+
+Storage: localStorage (now) → Redis (production)
+Data lifetime: Until order is placed or manually cleared
+Scales: Carefully — session affinity needed with Redis
+Reset safe: ❌ No — cart data lost if storage cleared without backup
+
+Current implementation:
+  CartContext.js → localStorage.setItem("wg_cart", ...)
+
+---
+
+### 2. 📦 Order Service
+Stateful — Long-term persistence
+
+Why: Orders are permanent business records.
+     Must survive forever — billing, refunds, reorders, audits.
+     In current build: localStorage (wg_orders).
+     In production: PostgreSQL / DynamoDB.
+
+Storage: localStorage (now) → PostgreSQL (production)
+Data lifetime: Permanent — never deleted
+Scales: Carefully — needs database replication
+Reset safe: ❌ No — order history lost if storage wiped
+
+Current implementation:
+  OrderContext.js → localStorage.setItem("wg_orders", ...)
+
+Records stored per order:
+  - Order ID (WG-timestamp)
+  - Items + quantities
+  - Delivery address
+  - Payment method
+  - Subtotal, taxes, discount, total
+  - Timestamps + status timeline
+
+---
+
+### 3. 🚚 Delivery / Tracking Service
+Stateful — Time-bound persistence
+
+Why: Order status must be consistent across devices.
+     If customer refreshes, status must not reset to "Confirmed".
+     In current build: in-memory React state (lost on refresh).
+     In production: Redis pub/sub + WebSockets.
+
+Storage: React state (now) → Redis + WebSocket (production)
+Data lifetime: Duration of delivery (~45 mins), then archived
+Scales: Carefully — WebSocket connections are stateful
+Reset safe: ❌ No — tracking progress lost on refresh (current build)
+
+Stages tracked:
+  Confirmed → Being Prepared → Out for Delivery → Delivered
+
+---
+
+### 4. 👤 User / Auth Service
+Stateful — Long-term persistence
+
+Why: User profiles, saved addresses, preferences, login sessions
+     must persist across devices and sessions.
+     In current build: not yet implemented (no login).
+     In production: PostgreSQL (user profiles) + Redis (JWT sessions).
+
+Storage: PostgreSQL (profiles) + Redis (session tokens)
+Data lifetime: Permanent (profiles) / TTL (sessions)
+Scales: Carefully — session store must be shared across instances
+Reset safe: ❌ No — accounts and history lost
 
 ---
 
 ## SUMMARY TABLE
 
-| Service | Persistent Storage | Type |
-| --- | --- | --- |
-| cartservice | ✅ Yes | Redis |
-| checkoutservice | ❌ No | Stateless |
-| productcatalogservice | ❌ No | In-memory JSON |
-| recommendationservice | ❌ No | Stateless |
-| paymentservice | ❌ No | Fake |
-| shippingservice | ❌ No | Fake |
-| emailservice | ❌ No | Fake |
-| adservice | ❌ No | In-memory |
-| frontend | ❌ No | Stateless |
-| currencyservice | ❌ No | In-memory |
-| loadgenerator | ❌ No | Stateless |
+| Service | Type | Current Storage | Production Storage | Horizontal Scale
+| --- | --- | --- | --- | --- |
+| Menu Service | 🔄 Stateless | Static JS file | Read-only DB / CDN | ✅ Free |
+| Search & Filter | 🔄 Stateless | --- | Elasticsearch | ✅ Free |
+| Payment Service | 🔄 Stateless | --- | External gateway | ✅ Free |
+| Notification Service | 🔄 Stateless | --- | Message queue | ✅ Free |
+| Recommendation Service | 🔄 Stateless | Static JS file | Read-only DB | ✅ Free |
+| Promotion / Ad Service | 🔄 Stateless | Hardcoded rules | Rules DB | ✅ Free |
+| Cart Service | 💾 Stateful | localStorage | Redis (TTL) | ⚠️ Careful |
+| Order Service | 💾 Stateful | localStorage | PostgreSQL | ⚠️ Careful |
+| Tracking Service | 💾 Stateful | React state | Redis + WebSocket | ⚠️ Careful |
+| User / Auth Service | 💾 Stateful | --- | PostgreSQL + Redis | ⚠️ Careful |
+| loadgenerator | 🔄 Stateless | --- | 
 
 ---
 
