@@ -204,7 +204,7 @@ So it uses **minimal persistence** on purpose.
 ### 🔄 Stateless Services (6)
 These services process and return — they don't own any data.
 
-1. 🍽️ Menu Service
+### ❌1. 🍽️ Menu Service
 Stateless
 Why: Dish catalogue is read-only static data (menuData.js).
      Every request reads the same data — no writes, no sessions.
@@ -228,7 +228,7 @@ Reset safe: ✅ Yes
 
 ---
 
-### ❌ 💳 Payment Service
+### ❌3. 💳 Payment Service
 Stateless
 Why: Receives payment details, validates, calls payment gateway
      (Razorpay/Stripe), returns success/failure.
@@ -240,7 +240,7 @@ Reset safe: ✅ Yes — transaction records live in Order Service
 
 ---
 
-### ❌ 📧 Notification Service
+### ❌4. 📧 Notification Service
 Stateless
 Why: Receives an event (order placed), sends email/SMS, done.
      No memory of what was sent — logs go to logging stack.
@@ -251,7 +251,7 @@ Reset safe: ✅ Yes
 
 ---
 
-### ❌ 🌟 Recommendation Service
+### ❌5. 🌟 Recommendation Service
 Stateless (in current build)
 Why: Takes current item/cart context, runs rating-based algorithm,
      returns top N dishes. Pure function — same input = same output.
@@ -265,7 +265,7 @@ Note: Becomes stateful if you add personalised ML models
 
 ---
 
-### ❌ 📢 Promotion / Ad Service
+### ❌6. 📢 Promotion / Ad Service
 Stateless
 Why: Coupon codes are hardcoded rules (WELCOME20 = 20% off).
      Validates a code and returns a discount value — no state held.
@@ -283,7 +283,7 @@ Note: Becomes stateful if you track "coupon used per user"
 ### 💾 Stateful / Persistent Services (4)
 These own data that must survive restarts, scaling events, and deployments.
 
-1. 🛒 Cart Service
+### 1. 🛒 Cart Service
 Stateful — Short-lived persistence
 
 Why: Cart must survive page refresh, tab close, browser restart.
