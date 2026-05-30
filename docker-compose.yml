@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  # ── Development server ─────────────────────────────────────────────────────
+  app-dev:
+    image: node:20-alpine
+    container_name: watika-dev
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    command: sh -c "npm install && npm start"
+    profiles: ["dev"]
+
+  # ── Production nginx container ─────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: watika-prod
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    profiles: ["prod"]
+
+  # ── Automated security scan (Trivy) ────────────────────────────────────────
+  trivy-scan:
+    image: aquasec/trivy:latest
+    container_name: watika-trivy
+    command: image --exit-code 1 --severity HIGH,CRITICAL watika-prod
+    depends_on:
+      app:
+        condition: service_healthy
+    profiles: ["scan"]
+
+networks:
+  default:
+    name: watika-network
