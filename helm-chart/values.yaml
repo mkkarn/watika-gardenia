@@ -1,0 +1,124 @@
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Default values for onlineboutique.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+  frontend:
+    repository: ghcr.io/yourorg/restaurant/frontend
+    tag: v1.0.0
+  menuService:
+    repository: ghcr.io/yourorg/restaurant/menu-service
+    tag: v1.0.0
+  cartService:
+    repository: ghcr.io/yourorg/restaurant/cart-service
+    tag: v1.0.0
+  orderService:
+    repository: ghcr.io/yourorg/restaurant/order-service
+    tag: v1.0.0
+  paymentService:
+    repository: ghcr.io/yourorg/restaurant/payment-service
+    tag: v1.0.0
+  recommendationService:
+    repository: ghcr.io/yourorg/restaurant/recommendation-service
+    tag: v1.0.0
+  authService:
+    repository: ghcr.io/yourorg/restaurant/auth-service
+    tag: v1.0.0
+
+frontend:
+  create: true
+  name: frontend
+  externalService: true
+  platform: aws
+  resources:
+    requests:
+      cpu: 200m
+      memory: 128Mi
+    limits:
+      cpu: 400m
+      memory: 256Mi
+
+menuService:
+  create: true
+  name: menu-service
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+cartService:
+  create: true
+  name: cart-service
+  resources:
+    requests:
+      cpu: 150m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+
+orderService:
+  create: true
+  name: order-service
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 400m
+      memory: 512Mi
+
+paymentService:
+  create: true
+  name: payment-service
+  resources:
+    requests:
+      cpu: 150m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+
+recommendationService:
+  create: true
+  name: recommendation-service
+  resources:
+    requests:
+      cpu: 100m
+      memory: 220Mi
+    limits:
+      cpu: 200m
+      memory: 450Mi
+
+authService:
+  create: true
+  name: auth-service
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+ordersDatabase:
+  type: postgres
+  connectionString: "postgres://orders-db:5432"
+  inClusterPostgres:
+    create: true
+    name: orders-db
+    publicRepository: true
+
