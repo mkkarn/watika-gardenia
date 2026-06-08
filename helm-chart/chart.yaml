@@ -1,4 +1,4 @@
-# Copyright 2023 Google LLC
+# Copyright 2026 Manish
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,26 +13,31 @@
 # limitations under the License.
 
 apiVersion: v2
-name: watika-gardenia
-description: A Helm chart for Kubernetes for watika-gardenia
-
-# A chart can be either an 'application' or a 'library' chart.
-#
-# Application charts are a collection of templates that can be packaged into versioned archives
-# to be deployed.
-#
-# Library charts provide useful utilities or functions for the chart developer. They're included as
-# a dependency of application charts to inject those utilities and functions into the rendering
-# pipeline. Library charts do not define any templates and therefore cannot be deployed.
+name: restaurant-app
+description: A Helm chart for Kubernetes to deploy the Restaurant App microservices (Frontend, Menu, Cart, Orders, Payment, Recommendation, Auth, Postgres DB).
 type: application
 
-# This is the chart version. This version number should be incremented each time you make changes
-# to the chart and its templates, including the app version.
-# Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.10.4
+# Chart version — bump this whenever you change chart templates or values.
+version: 1.0.0
 
-# This is the version number of the application being deployed. This version number should be
-# incremented each time you make changes to the application. Versions are not expected to
-# follow Semantic Versioning. They should reflect the version the application is using.
-# It is recommended to use it with quotes.
-appVersion: "v0.10.4"
+# Application version — bump this whenever you release a new app image.
+appVersion: "v1.0.0"
+
+maintainers:
+  - name: Manish
+    email: manish@example.com
+    url: https://github.com/yourorg
+
+sources:
+  - https://github.com/yourorg/restaurant-app
+
+keywords:
+  - restaurant
+  - microservices
+  - helm
+  - kubernetes
+  - eks
+  - gitops
+
+home: https://www.yourrestaurant.com
+
