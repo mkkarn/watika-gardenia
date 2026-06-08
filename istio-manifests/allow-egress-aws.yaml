@@ -1,0 +1,21 @@
+# Copyright 2026 Manish
+# Licensed under the Apache License, Version 2.0
+
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: allow-egress-aws-apis
+spec:
+  hosts:
+  - "sts.amazonaws.com"          # Required for IAM token exchange
+  - "*.amazonaws.com"            # General AWS service endpoints (S3, DynamoDB, etc.)
+  ports:
+  - number: 80
+    protocol: HTTP
+    name: http
+  - number: 443
+    protocol: HTTPS
+    name: https
+  resolution: DNS
+  location: MESH_EXTERNAL
+

@@ -1,0 +1,20 @@
+# Copyright 2026 Manish
+# Licensed under the Apache License, Version 2.0
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: frontend
+  namespace: restaurant-app
+spec:
+  hosts:
+  - "restaurant.example.com"
+  gateways:
+  - frontend-gateway
+  http:
+  - route:
+    - destination:
+        host: frontend
+        port:
+          number: 80
+

@@ -1,0 +1,28 @@
+# Copyright 2026 Manish
+# Licensed under the Apache License, Version 2.0
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: frontend-gateway
+  namespace: restaurant-app
+spec:
+  selector:
+    istio: ingressgateway   # use Istio’s default ingress gateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "restaurant.example.com"
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: restaurant-app-cert   # Kubernetes TLS secret from ACM
+    hosts:
+    - "restaurant.example.com"
+
