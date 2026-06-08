@@ -1,0 +1,4 @@
+components:
+- smoke-test.yaml
+- chaos-test.yaml
+
