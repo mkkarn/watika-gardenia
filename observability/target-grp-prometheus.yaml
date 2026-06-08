@@ -1,0 +1,12 @@
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: prometheus-tgb
+  namespace: monitoring
+spec:
+  serviceRef:
+    name: kube-prometheus-stack-prometheus
+    port: 9090
+  targetGroupARN: arn:aws:elasticloadbalancing:ap-south-1:439440559037:targetgroup/watika-gardenia-prometheus/ijkl9012
+  targetType: ip
+

@@ -1,0 +1,12 @@
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: grafana-tgb
+  namespace: monitoring
+spec:
+  serviceRef:
+    name: kube-prometheus-stack-grafana
+    port: 80
+  targetGroupARN: arn:aws:elasticloadbalancing:ap-south-1:439440559037:targetgroup/watika-gardenia-grafana/abcd1234
+  targetType: ip
+

@@ -1,0 +1,12 @@
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: kibana-tgb
+  namespace: monitoring
+spec:
+  serviceRef:
+    name: eck-kibana
+    port: 5601
+  targetGroupARN: arn:aws:elasticloadbalancing:ap-south-1:439440559037:targetgroup/watika-gardenia-kibana/efgh5678
+  targetType: ip
+
