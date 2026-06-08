@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+resources:
+- ../base/
+patchesStrategicMerge:
+- |-
+  apiVersion: networking.istio.io/v1alpha3
+  kind: VirtualService
+  metadata:
+    name: frontend
+    namespace: restaurant-app
+  spec:
+    hosts:
+    - "restaurant.example.com"
+    gateways:
+    - frontend-gateway
+    http:
+    - route:
+      - destination:
+          host: frontend
+          port:
+            number: 80
+

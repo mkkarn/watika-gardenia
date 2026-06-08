@@ -1,0 +1,6 @@
+components:
+- monitoring.yaml
+- network-policies.yaml
+- service-mesh-istio.yaml
+- without-loadgenerator.yaml
+
