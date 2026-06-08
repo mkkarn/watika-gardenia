@@ -1,0 +1,11 @@
+resources:
+- frontend.yaml
+- menu-service.yaml
+- cart-service.yaml
+- order-service.yaml
+- payment-service.yaml
+- recommendation-service.yaml
+- auth-service.yaml
+- orders-db.yaml
+- loadgenerator.yaml
+
