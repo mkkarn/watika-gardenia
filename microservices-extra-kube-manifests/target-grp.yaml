@@ -1,0 +1,12 @@
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: TargetGroupBinding
+metadata:
+  name: frontend-tgb
+  namespace: restaurant-app
+spec:
+  serviceRef:
+    name: frontend
+    port: 80
+  targetGroupARN: arn:aws:elasticloadbalancing:ap-south-1:123456789012:targetgroup/watika-gardenia-frontend/abcd1234
+  targetType: ip
+
