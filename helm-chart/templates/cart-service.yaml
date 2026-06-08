@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.cartService.name }}
+  labels:
+    app: {{ .Values.cartService.name }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: {{ .Values.cartService.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.cartService.name }}
+    spec:
+      containers:
+        - name: {{ .Values.cartService.name }}
+          image: "{{ .Values.images.cartService.repository }}:{{ .Values.images.cartService.tag }}"
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: {{ .Values.cartService.resources.requests.cpu }}
+              memory: {{ .Values.cartService.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.cartService.resources.limits.cpu }}
+              memory: {{ .Values.cartService.resources.limits.memory }}
+          env:
+            - name: CART_DB_HOST
+              value: {{ .Values.cartDatabase.connectionString | quote }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.cartService.name }}
+  labels:
+    app: {{ .Values.cartService.name }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Values.cartService.name }}
+  ports:
+    - port: 80
+      targetPort: 8080
+

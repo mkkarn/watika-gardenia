@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.paymentService.name }}
+  labels:
+    app: {{ .Values.paymentService.name }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: {{ .Values.paymentService.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.paymentService.name }}
+    spec:
+      containers:
+        - name: {{ .Values.paymentService.name }}
+          image: "{{ .Values.images.paymentService.repository }}:{{ .Values.images.paymentService.tag }}"
+          ports:
+            - container

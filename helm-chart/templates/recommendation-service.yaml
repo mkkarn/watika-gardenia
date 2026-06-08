@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.recommendationService.name }}
+  labels:
+    app: {{ .Values.recommendationService.name }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: {{ .Values.recommendationService.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.recommendationService.name }}
+    spec:
+      containers:
+        - name: {{ .Values.recommendationService.name }}
+          image: "{{ .Values.images.recommendationService.repository }}:{{ .Values.images.recommendationService.tag }}"
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: {{ .Values.recommendationService.resources.requests.cpu }}
+              memory: {{ .Values.recommendationService.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.recommendationService.resources.limits.cpu }}
+              memory: {{ .Values.recommendationService.resources.limits.memory }}
+          env:
+            - name: MENU_SERVICE_URL
+              value: "http://{{ .Values.menuService.name }}:80"
+            - name: ORDERS_SERVICE_URL
+              value: "http://{{ .Values.orderService.name }}:80"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.recommendationService.name }}
+  labels:
+    app: {{ .Values.recommendationService.name }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Values.recommendationService.name }}
+  ports:
+    - port: 80
+      targetPort: 8080
+

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.menuService.name }}
+  labels:
+    app: {{ .Values.menuService.name }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: {{ .Values.menuService.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.menuService.name }}
+    spec:
+      containers:
+        - name: {{ .Values.menuService.name }}
+          image: "{{ .Values.images.menuService.repository }}:{{ .Values.images.menuService.tag }}"
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: {{ .Values.menuService.resources.requests.cpu }}
+              memory: {{ .Values.menuService.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.menuService.resources.limits.cpu }}
+              memory: {{ .Values.menuService.resources.limits.memory }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.menuService.name }}
+  labels:
+    app: {{ .Values.menuService.name }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Values.menuService.name }}
+  ports:
+    - port: 80
+      targetPort: 8080
+

@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.authService.name }}
+  labels:
+    app: {{ .Values.authService.name }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: {{ .Values.authService.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.authService.name }}
+    spec:
+      containers:
+        - name: {{ .Values.authService.name }}
+          image: "{{ .Values.images.authService.repository }}:{{ .Values.images.authService.tag }}"
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: {{ .Values.authService.resources.requests.cpu }}
+              memory: {{ .Values.authService.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.authService.resources.limits.cpu }}
+              memory: {{ .Values.authService.resources.limits.memory }}
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: auth-service-secrets
+                  key: jwtSecret
+            - name: USERS_DB_HOST
+              value: {{ .Values.authService.dbConnectionString | quote }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.authService.name }}
+  labels:
+    app: {{ .Values.authService.name }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Values.authService.name }}
+  ports:
+    - port: 80
+      targetPort: 8080
+

@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.ordersDatabase.name }}
+  labels:
+    app: {{ .Values.ordersDatabase.name }}
+spec:
+  serviceName: {{ .Values.ordersDatabase.name }}
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.ordersDatabase.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.ordersDatabase.name }}
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: orders
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: orders-db-secrets
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: orders-db-secrets
+                  key: password
+          volumeMounts:
+            - name: orders-db-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: orders-db-data
+          persistentVolumeClaim:
+            claimName: orders-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.ordersDatabase.name }}
+  labels:
+    app: {{ .Values.ordersDatabase.name }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Values.ordersDatabase.name }}
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: orders-db-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+

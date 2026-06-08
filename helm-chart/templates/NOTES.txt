@@ -1,0 +1,37 @@
+Thank you for installing the Restaurant App Helm chart!
+
+Your release name is: {{ .Release.Name }}
+Your namespace is: {{ .Release.Namespace }}
+
+The following microservices have been deployed:
+- Frontend
+- Menu Service
+- Cart Service
+- Order Service
+- Payment Service
+- Recommendation Service
+- Auth Service
+- Orders Database (Postgres)
+
+To check the status of your pods:
+  kubectl get pods -n {{ .Release.Namespace }}
+
+To check the services:
+  kubectl get svc -n {{ .Release.Namespace }}
+
+If you enabled Ingress for the frontend, access your app at:
+  https://{{ .Values.frontend.host }}
+
+If you did not enable Ingress, you can port-forward to access locally:
+  kubectl port-forward svc/{{ .Values.frontend.name }} 8080:80 -n {{ .Release.Namespace }}
+  Then open http://localhost:8080 in your browser.
+
+Database connection string:
+  {{ .Values.ordersDatabase.connectionString }}
+
+For troubleshooting:
+- Ensure ACM certificate is valid and attached to the ALB Ingress.
+- Verify Route53 DNS alias points to the ALB.
+- Check pod logs:
+  kubectl logs -n {{ .Release.Namespace }} <pod-name>
+
