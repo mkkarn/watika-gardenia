@@ -14,25 +14,25 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
   frontend:
-    repository: ghcr.io/yourorg/restaurant/frontend
+    repository: ghcr.io/mkkarn/restaurant-app/frontend
     tag: v1.0.0
   menuService:
-    repository: ghcr.io/yourorg/restaurant/menu-service
+    repository: ghcr.io/mkkarn/restaurant-app/menu-service
     tag: v1.0.0
   cartService:
-    repository: ghcr.io/yourorg/restaurant/cart-service
+    repository: ghcr.io/mkkarn/restaurant-app/cart-service
     tag: v1.0.0
   orderService:
-    repository: ghcr.io/yourorg/restaurant/order-service
+    repository: ghcr.io/mkkarn/restaurant-app/order-service
     tag: v1.0.0
   paymentService:
-    repository: ghcr.io/yourorg/restaurant/payment-service
+    repository: ghcr.io/mkkarn/restaurant-app/payment-service
     tag: v1.0.0
   recommendationService:
-    repository: ghcr.io/yourorg/restaurant/recommendation-service
+    repository: ghcr.io/mkkarn/restaurant-app/recommendation-service
     tag: v1.0.0
   authService:
-    repository: ghcr.io/yourorg/restaurant/auth-service
+    repository: ghcr.io/mkkarn/restaurant-app/auth-service
     tag: v1.0.0
 
 frontend:

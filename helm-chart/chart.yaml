@@ -25,11 +25,11 @@ appVersion: "v1.0.0"
 
 maintainers:
   - name: Manish
-    email: manish@example.com
-    url: https://github.com/yourorg
+    email: mkkarn1904@gmail.com
+    url: https://github.com/mkkarn
 
 sources:
-  - https://github.com/yourorg/restaurant-app
+  - https://github.com/mkkarn/restaurant-app
 
 keywords:
   - restaurant
@@ -39,5 +39,5 @@ keywords:
   - eks
   - gitops
 
-home: https://www.yourrestaurant.com
+home: https://www.watika-gardenia.org
 
