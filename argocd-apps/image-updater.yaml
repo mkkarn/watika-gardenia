@@ -1,47 +1,42 @@
 apiVersion: argocd-image-updater.argoproj.io/v1alpha1
 kind: ImageUpdater
 metadata:
-  name: boutique-image-updater
+  name: watika-gardenia-image-updater
   namespace: argocd
 spec:
   namespace: argocd
   applicationRefs:
-    - namePattern: "boutique-*"
+    - namePattern: "watika-gardenia-*"
 
       commonUpdateSettings:
         updateStrategy: "newest-build"
         allowTags: "regexp:^sha-[a-f0-9]{7,40}$"
 
       images:
-        - alias: adservice
-          imageName: ghcr.io/laxmikantagiri/microservices-demo/adservice
-
-        - alias: cartservice
-          imageName: ghcr.io/laxmikantagiri/microservices-demo/cartservice
-
-        - alias: checkoutservice
-          imageName: ghcr.io/laxmikantagiri/microservices-demo/checkoutservice
-
-        - alias: currencyservice
-          imageName: ghcr.io/laxmikantagiri/microservices-demo/currencyservice
-
-        - alias: emailservice
-          imageName: ghcr.io/laxmikantagiri/microservices-demo/emailservice
-
         - alias: frontend
-          imageName: ghcr.io/laxmikantagiri/microservices-demo/frontend
+          imageName: ghcr.io/mkkarn/watika-gardenia-frontend
 
-        - alias: paymentservice
-          imageName: ghcr.io/laxmikantagiri/microservices-demo/paymentservice
+        - alias: menu
+          imageName: ghcr.io/mkkarn/watika-gardenia-menu
 
-        - alias: productcatalogservice
-          imageName: ghcr.io/laxmikantagiri/microservices-demo/productcatalogservice
+        - alias: cart
+          imageName: ghcr.io/mkkarn/watika-gardenia-cart
 
-        - alias: recommendationservice
-          imageName: ghcr.io/laxmikantagiri/microservices-demo/recommendationservice
+        - alias: orders
+          imageName: ghcr.io/mkkarn/watika-gardenia-orders
 
-        - alias: shippingservice
-          imageName: ghcr.io/laxmikantagiri/microservices-demo/shippingservice
+        - alias: payment
+          imageName: ghcr.io/mkkarn/watika-gardenia-payment
+
+        - alias: recommendation
+          imageName: ghcr.io/mkkarn/watika-gardenia-recommendation
+
+        - alias: auth
+          imageName: ghcr.io/mkkarn/watika-gardenia-auth
 
         - alias: loadgenerator
-          imageName: ghcr.io/laxmikantagiri/microservices-demo/loadgenerator
+          imageName: ghcr.io/mkkarn/watika-gardenia-loadgenerator
+
+        - alias: orders-db
+          imageName: ghcr.io/mkkarn/watika-gardenia-orders-db
+
